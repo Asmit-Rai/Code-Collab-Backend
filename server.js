@@ -1,24 +1,27 @@
 const express = require('express');
 const http = require('http');
-const path = require('path');
-const cors = require('cors'); // Added for cross-origin requests
+const cors = require('cors');
 const { Server } = require('socket.io');
 const ACTIONS = require('./Actions'); // Ensure Actions.js exists
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000/", // Adjust this if your frontend has a fixed URL
+        origin: process.env.FRONTEND_URL || "http://localhost:3000", // Use env variable for Render
         methods: ["GET", "POST"],
+        allowedHeaders: ["Authorization"],
+        credentials: true,
     },
+    pingInterval: 25000, // Prevents disconnection issues
+    pingTimeout: 60000,
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
 app.use(express.json());
 
-// User socket mapping
 const userSocketMap = {};
 function getAllConnectedClients(roomId) {
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
@@ -67,11 +70,10 @@ io.on('connection', (socket) => {
     });
 });
 
-
 app.get('/', (req, res) => {
     res.send("Backend is running successfully!");
 });
 
-
+// Use process.env.PORT for Render deployment
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
