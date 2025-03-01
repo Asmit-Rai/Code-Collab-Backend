@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:3000", // Use env variable for Render
+        origin: process.env.FRONTEND_URL || "https://code-collab-frontend-rust.vercel.app/", // Use env variable for Render
         methods: ["GET", "POST"],
         allowedHeaders: ["Authorization"],
         credentials: true,
@@ -19,7 +19,7 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || "https://code-collab-frontend-rust.vercel.app/", credentials: true }));
 app.use(express.json());
 
 const userSocketMap = {};
